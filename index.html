@@ -1,0 +1,1446 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Логічні функції в Excel та Google Таблицях | Інформатика 8 клас</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --accent: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --shadow: 0 10px 40px rgba(0,0,0,0.1);
+            --shadow-hover: 0 20px 60px rgba(0,0,0,0.15);
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Анімації */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        @keyframes success {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .animate-in {
+            animation: slideIn 0.6s ease-out forwards;
+        }
+
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        .success-pop {
+            animation: success 0.5s ease-out forwards;
+        }
+
+        /* Навігація та прогрес */
+        .top-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 1rem 2rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .progress-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .progress-bar {
+            width: 200px;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--gradient-1);
+            width: 0%;
+            transition: width 0.5s ease;
+            background-size: 200% 200%;
+            animation: gradient 3s ease infinite;
+        }
+
+        .score-display {
+            background: var(--primary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Секції */
+        .section {
+            min-height: 100vh;
+            padding: 6rem 2rem 2rem;
+            display: none;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        /* Герой секція */
+        .hero {
+            text-align: center;
+            padding: 4rem 1rem;
+            background: var(--gradient-1);
+            color: white;
+            border-radius: 30px;
+            margin-bottom: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            opacity: 0.3;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Картки запитань */
+        .questions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .question-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .question-card::before {
+            content: '?';
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            font-size: 8rem;
+            opacity: 0.05;
+            font-weight: 900;
+        }
+
+        .question-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--primary);
+        }
+
+        .question-card h3 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .question-card p {
+            color: var(--gray);
+            font-size: 0.95rem;
+        }
+
+        /* Форма входу */
+        .login-container {
+            max-width: 500px;
+            margin: 3rem auto;
+            background: white;
+            padding: 3rem;
+            border-radius: 30px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: white;
+            background: var(--gradient-1);
+            background-size: 200% 200%;
+            animation: gradient 3s ease infinite;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--gradient-2);
+        }
+
+        .btn-accent {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        /* Список учасників */
+        .classroom-panel {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .students-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .student-badge {
+            background: var(--gradient-3);
+            color: white;
+            padding: 0.75rem 1.25rem;
+            border-radius: 50px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            animation: float 3s ease-in-out infinite;
+            animation-delay: calc(var(--i) * 0.1s);
+        }
+
+        .online-count {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #dcfce7;
+            color: #166534;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        /* Інтерактивні картки функцій */
+        .functions-showcase {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .function-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .function-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-1);
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+
+        .function-card:hover::after {
+            transform: scaleX(1);
+        }
+
+        .function-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .function-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient-1);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .function-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+
+        .function-formula {
+            background: #f1f5f9;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            color: var(--primary);
+            font-weight: 700;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+
+        .function-description {
+            color: var(--gray);
+            font-size: 0.9rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .function-card.expanded .function-description {
+            max-height: 200px;
+        }
+
+        /* Excel-симулятор */
+        .excel-simulator {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin: 2rem 0;
+        }
+
+        .excel-grid {
+            display: grid;
+            grid-template-columns: 50px repeat(4, 1fr);
+            gap: 2px;
+            background: #d1d5db;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .excel-header {
+            background: #f3f4f6;
+            padding: 0.75rem;
+            text-align: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+
+        .excel-cell {
+            background: white;
+            padding: 0.75rem;
+            text-align: center;
+            font-family: monospace;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .excel-cell.input-cell {
+            background: #fef3c7;
+            cursor: pointer;
+        }
+
+        .excel-cell.output-cell {
+            background: #dbeafe;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .formula-bar {
+            background: #f3f4f6;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: monospace;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .formula-input {
+            flex: 1;
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            border: 1px solid #d1d5db;
+        }
+
+        /* Квіз */
+        .quiz-container {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin: 2rem 0;
+        }
+
+        .quiz-question {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--dark);
+        }
+
+        .quiz-options {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .quiz-option {
+            padding: 1rem 1.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .quiz-option:hover {
+            border-color: var(--primary);
+            background: #f8fafc;
+        }
+
+        .quiz-option.selected {
+            border-color: var(--primary);
+            background: #eef2ff;
+        }
+
+        .quiz-option.correct {
+            border-color: var(--accent);
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .quiz-option.wrong {
+            border-color: var(--danger);
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .option-letter {
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .quiz-option.correct .option-letter {
+            background: var(--accent);
+        }
+
+        .quiz-option.wrong .option-letter {
+            background: var(--danger);
+        }
+
+        /* Повідомлення */
+        .message {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            color: white;
+            font-weight: 700;
+            box-shadow: var(--shadow);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 2000;
+        }
+
+        .message.show {
+            transform: translateX(0);
+        }
+
+        .message.success {
+            background: var(--accent);
+        }
+
+        .message.error {
+            background: var(--danger);
+        }
+
+        /* Практична робота */
+        .practice-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem;
+            border-radius: 30px;
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .iframe-container {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-top: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .iframe-placeholder {
+            aspect-ratio: 16/9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f1f5f9;
+            color: var(--gray);
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        /* Результати */
+        .results-container {
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .score-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: var(--gradient-1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 2rem auto;
+            color: white;
+            font-size: 3rem;
+            font-weight: 800;
+            box-shadow: var(--shadow);
+        }
+
+        /* Адаптивність */
+        @media (max-width: 768px) {
+            .top-bar {
+                padding: 1rem;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+
+            .progress-bar {
+                width: 100px;
+            }
+
+            .section {
+                padding: 5rem 1rem 1rem;
+            }
+
+            .hero {
+                padding: 2rem 1rem;
+            }
+
+            .login-container {
+                padding: 2rem 1.5rem;
+            }
+
+            .excel-grid {
+                font-size: 0.75rem;
+            }
+        }
+
+        /* Додаткові елементи */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: #fef3c7;
+            color: #92400e;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 700;
+            margin: 0.5rem;
+        }
+
+        .tip-box {
+            background: #dbeafe;
+            border-left: 4px solid var(--primary);
+            padding: 1.5rem;
+            border-radius: 0 12px 12px 0;
+            margin: 1.5rem 0;
+        }
+
+        .tip-box h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .comparison-table th {
+            background: var(--gradient-1);
+            color: white;
+        }
+
+        .comparison-table tr:hover {
+            background: #f8fafc;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .fade-in {
+            animation: slideIn 0.6s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+    <!-- Навігація -->
+    <nav class="top-bar">
+        <div class="logo">
+            <span>📊</span>
+            <span>ExcelPro</span>
+        </div>
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+            <div class="score-display">
+                <span>⭐</span>
+                <span id="scoreValue">0</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Повідомлення -->
+    <div id="message" class="message"></div>
+
+    <!-- СЕКЦІЯ 1: ВСТУП ТА ВХІД -->
+    <section id="section-intro" class="section active">
+        <div class="hero animate-in">
+            <h1>🧠 Логічні функції в Excel та Google Таблицях</h1>
+            <p class="hero-subtitle">Навчимося програмувати таблиці! Інформатика 8 клас</p>
+        </div>
+
+        <div class="questions-grid">
+            <div class="question-card animate-in" style="--delay: 0.1s" onclick="toggleCard(this)">
+                <h3>🤖 Як комп'ютер приймає рішення?</h3>
+                <p>Комп'ютер використовує логічні операції: так/ні, істина/хибність. Це основа штучного інтелекту!</p>
+            </div>
+            <div class="question-card animate-in" style="--delay: 0.2s" onclick="toggleCard(this)">
+                <h3>📋 Чи може таблиця думати?</h3>
+                <p>Так! За допомогою функцій IF, AND, OR таблиця може аналізувати дані і автоматично приймати рішення.</p>
+            </div>
+            <div class="question-card animate-in" style="--delay: 0.3s" onclick="toggleCard(this)">
+                <h3>🎯 Коли ми використовуємо умови?</h3>
+                <p>Кожен день! "Якщо йде дощ — візьму парасольку", "Якщо оцінка ≥ 9 — отримаю знижку"</p>
+            </div>
+        </div>
+
+        <div class="login-container animate-in">
+            <h2>👋 Приєднуйся до уроку!</h2>
+            <p style="color: var(--gray); margin-bottom: 1.5rem;">Введи своє ім'я, щоб почати навчання</p>
+            
+            <div class="input-group">
+                <label for="studentName">Ім'я та прізвище</label>
+                <input type="text" id="studentName" placeholder="Наприклад: Марія Петренко" required>
+            </div>
+            
+            <button class="btn" onclick="joinClass()">
+                <span>🚀</span>
+                <span>Приєднатися до уроку</span>
+            </button>
+
+            <div id="classroomInfo" class="hidden">
+                <div class="classroom-panel">
+                    <div class="online-count">
+                        <span class="pulse-dot"></span>
+                        <span>Онлайн: <span id="onlineCount">1</span> учень</span>
+                    </div>
+                    <h3>Учасники уроку:</h3>
+                    <div class="students-grid" id="studentsList">
+                        <!-- Учні додаються через JS -->
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 2rem;">
+                    <button class="btn btn-secondary" onclick="nextSection('section-recall')">
+                        <span>Почати урок</span>
+                        <span>→</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- СЕКЦІЯ 2: АКТУАЛІЗАЦІЯ ЗНАНЬ -->
+    <section id="section-recall" class="section">
+        <div class="hero animate-in" style="background: var(--gradient-2);">
+            <h1>🔄 Пригадаймо базові функції</h1>
+            <p class="hero-subtitle">Перед тим як вивчати логіку, освіжимо пам'ять</p>
+        </div>
+
+        <div class="functions-showcase">
+            <div class="function-card animate-in" onclick="toggleCard(this)">
+                <div class="function-icon">Σ</div>
+                <h3>SUM</h3>
+                <div class="function-formula">=SUM(A1:A10)</div>
+                <div class="function-description">
+                    Додає всі числа в діапазоні. Наприклад, підрахунок загальної суми покупок.
+                </div>
+            </div>
+            <div class="function-card animate-in" onclick="toggleCard(this)">
+                <div class="function-icon" style="background: var(--gradient-2);">x̄</div>
+                <h3>AVERAGE</h3>
+                <div class="function-formula">=AVERAGE(B1:B10)</div>
+                <div class="function-description">
+                    Обчислює середнє арифметичне. Корисно для обчислення середнього балу учня.
+                </div>
+            </div>
+            <div class="function-card animate-in" onclick="toggleCard(this)">
+                <div class="function-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">↓</div>
+                <h3>MIN</h3>
+                <div class="function-formula">=MIN(C1:C20)</div>
+                <div class="function-description">
+                    Знаходить найменше значення. Наприклад, найнижчу ціну товару.
+                </div>
+            </div>
+            <div class="function-card animate-in" onclick="toggleCard(this)">
+                <div class="function-icon" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">↑</div>
+                <h3>MAX</h3>
+                <div class="function-formula">=MAX(D1:D15)</div>
+                <div class="function-description">
+                    Знаходить найбільше значення. Наприклад, максимальну температуру за місяць.
+                </div>
+            </div>
+        </div>
+
+        <div class="tip-box animate-in">
+            <h4>💡 Пам'ятаєш абсолютні посилання?</h4>
+            <p><strong>$A$1</strong> — абсолютне посилання (не змінюється при копіюванні)<br>
+            <strong>A1</strong> — відносне посилання (змінюється відносно нової позиції)<br>
+            <strong>$A1 або A$1</strong> — мішане посилання</p>
+        </div>
+
+        <!-- Міні-квіз на посилання -->
+        <div class="quiz-container animate-in">
+            <h3 style="margin-bottom: 1rem;">🧩 Перевір себе: Абсолютні vs Відносні посилання</h3>
+            <div id="referenceQuiz">
+                <p class="quiz-question">Що станеться з формулою =$A$1+B1 при копіюванні вниз на 1 рядок?</p>
+                <div class="quiz-options">
+                    <div class="quiz-option" onclick="checkReferenceAnswer(this, false)">
+                        <span class="option-letter">A</span>
+                        <span>стане =$A$2+B2</span>
+                    </div>
+                    <div class="quiz-option" onclick="checkReferenceAnswer(this, true)">
+                        <span class="option-letter">B</span>
+                        <span>стане =$A$1+B2</span>
+                    </div>
+                    <div class="quiz-option" onclick="checkReferenceAnswer(this, false)">
+                        <span class="option-letter">C</span>
+                        <span>стане =A1+$B$2</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 2rem;">
+            <button class="btn" onclick="nextSection('section-main')">
+                <span>Далі: Логічні функції</span>
+                <span>→</span>
+            </button>
+        </div>
+    </section>
+
+    <!-- СЕКЦІЯ 3: ОСНОВНА ТЕМА (ЛОГІЧНІ ФУНКЦІЇ) -->
+    <section id="section-main" class="section">
+        <div class="hero animate-in" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <h1>🎯 Логічні функції: IF, AND, OR, NOT</h1>
+            <p class="hero-subtitle">Навчимо таблицю приймати рішення!</p>
+        </div>
+
+        <!-- Таблиця порівняння -->
+        <table class="comparison-table animate-in">
+            <thead>
+                <tr>
+                    <th>Функція</th>
+                    <th>Синтаксис</th>
+                    <th>Що робить?</th>
+                    <th>Приклад із життя</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>IF (ЯКЩО)</strong></td>
+                    <td>=IF(умова; так; ні)</td>
+                    <td>Перевіряє умову і повертає одне з двох значень</td>
+                    <td>Якщо бал ≥ 9 → "Відмінно", інакше → "Добре"</td>
+                </tr>
+                <tr>
+                    <td><strong>AND (І)</strong></td>
+                    <td>=AND(умова1; умова2)</td>
+                    <td>Повертає ІСТИНА, якщо ВСІ умови виконані</td>
+                    <td>Знижка, якщо покупка > 1000 грн І клієнт VIP</td>
+                </tr>
+                <tr>
+                    <td><strong>OR (АБО)</strong></td>
+                    <td>=OR(умова1; умова2)</td>
+                    <td>Повертає ІСТИНА, якщо ХОЧА Б одна умова виконана</td>
+                    <td>Вихідний, якщо субота АБО неділя</td>
+                </tr>
+                <tr>
+                    <td><strong>NOT (НЕ)</strong></td>
+                    <td>=NOT(умова)</td>
+                    <td>Інвертує результат (істина → хибність)</td>
+                    <td>НЕ дорослий → дитина</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Інтерактивні симулятори -->
+        <div class="excel-simulator animate-in">
+            <h3>🧪 Лабораторія: Функція IF (ЯКЩО)</h3>
+            <p style="color: var(--gray); margin-bottom: 1rem;">Введи свої дані і подивись, як працює формула!</p>
+            
+            <div class="formula-bar">
+                <span style="color: var(--gray);">fx</span>
+                <div class="formula-input">=IF(B2>=9;"Відмінно";"Добре")</div>
+            </div>
+
+            <div class="excel-grid" style="max-width: 600px;">
+                <div class="excel-header"></div>
+                <div class="excel-header">A</div>
+                <div class="excel-header">B</div>
+                <div class="excel-header">C</div>
+                <div class="excel-header">D</div>
+                
+                <div class="excel-header">1</div>
+                <div class="excel-cell">Учень</div>
+                <div class="excel-cell">Бал</div>
+                <div class="excel-cell">Оцінка</div>
+                <div class="excel-cell"></div>
+                
+                <div class="excel-header">2</div>
+                <div class="excel-cell">Ти</div>
+                <div class="excel-cell input-cell" contenteditable="true" onblur="updateIF(this)" id="scoreInput">8</div>
+                <div class="excel-cell output-cell" id="gradeOutput">Добре</div>
+                <div class="excel-cell"></div>
+            </div>
+
+            <div class="tip-box" style="margin-top: 1rem;">
+                <h4>📝 Пояснення:</h4>
+                <p>Формула перевіряє: якщо бал у клітинці B2 більше або дорівнює 9 — пише "Відмінно", інакше — "Добре". Спробуй змінити число!</p>
+            </div>
+        </div>
+
+        <div class="excel-simulator animate-in">
+            <h3>🧪 Лабораторія: Функція AND (І)</h3>
+            <p style="color: var(--gray); margin-bottom: 1rem;">Перевіримо дві умови одночасно</p>
+            
+            <div class="formula-bar">
+                <span style="color: var(--gray);">fx</span>
+                <div class="formula-input">=AND(B2>=1000;C2="VIP")</div>
+            </div>
+
+            <div class="excel-grid" style="max-width: 600px;">
+                <div class="excel-header"></div>
+                <div class="excel-header">A</div>
+                <div class="excel-header">B</div>
+                <div class="excel-header">C</div>
+                <div class="excel-header">D</div>
+                
+                <div class="excel-header">1</div>
+                <div class="excel-cell">Клієнт</div>
+                <div class="excel-cell">Сума</div>
+                <div class="excel-cell">Статус</div>
+                <div class="excel-cell">Знижка?</div>
+                
+                <div class="excel-header">2</div>
+                <div class="excel-cell">Ти</div>
+                <div class="excel-cell input-cell" contenteditable="true" onblur="updateAND()" id="amountInput">1200</div>
+                <div class="excel-cell input-cell" contenteditable="true" onblur="updateAND()" id="statusInput">VIP</div>
+                <div class="excel-cell output-cell" id="discountOutput">TRUE</div>
+            </div>
+
+            <div class="tip-box" style="margin-top: 1rem;">
+                <h4>📝 Пояснення:</h4>
+                <p>AND повертає TRUE (ІСТИНА) тільки якщо ОБИДВІ умови виконані: сума ≥ 1000 І статус = "VIP". Зміни дані і подивись результат!</p>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 2rem;">
+            <button class="btn" onclick="nextSection('section-practice')">
+                <span>Перейти до практики</span>
+                <span>→</span>
+            </button>
+        </div>
+    </section>
+
+    <!-- СЕКЦІЯ 4: ПРАКТИЧНА РОБОТА -->
+    <section id="section-practice" class="section">
+        <div class="practice-section animate-in">
+            <h1>🛠️ Практична робота</h1>
+            <p style="font-size: 1.2rem; opacity: 0.9; margin: 1rem 0;">
+                Завдання: Створи таблицю розрахунку зарплати з преміями
+            </p>
+            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; margin-top: 1.5rem;">
+                <span class="badge">⭐ IF для перевірки плану</span>
+                <span class="badge">⭐ AND для премії</span>
+                <span class="badge">⭐ OR для надбавок</span>
+            </div>
+        </div>
+
+        <div class="tip-box animate-in">
+            <h4>📋 Інструкція:</h4>
+            <ol style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li>Відкрий Google Таблицю за посиланням нижче</li>
+                <li>Створи стовпці: Працівник, Продажі, План виконано, Премія</li>
+                <li>Використай =IF(B2>=100;"Так";"Ні") для перевірки плану</li>
+                <li>Додай =IF(AND(B2>=100;C2="Так");B2*0.1;0) для розрахунку премії</li>
+            </ol>
+        </div>
+
+        <div class="iframe-container animate-in">
+            <div class="iframe-placeholder">
+                <span style="font-size: 3rem;">📊</span>
+                <p>Тут буде вбудована Google Таблиця</p>
+                <p style="font-size: 0.9rem;">Заміни URL у коді на свою таблицю</p>
+                <button class="btn" onclick="window.open('https://sheets.new', '_blank')">
+                    <span>Відкрити Google Таблиці</span>
+                    <span>↗</span>
+                </button>
+            </div>
+            <!-- Розкоментуй для реального вбудовування:
+            <iframe src="https://docs.google.com/spreadsheets/d/ТВОЙ_ID/edit?usp=sharing" 
+                    style="width: 100%; height: 600px; border: none;"></iframe>
+            -->
+        </div>
+
+        <div style="text-align: center; margin-top: 2rem;">
+            <button class="btn btn-secondary" onclick="nextSection('section-test')">
+                <span>Пройти тест</span>
+                <span>📝</span>
+            </button>
+        </div>
+    </section>
+
+    <!-- СЕКЦІЯ 5: ЗАКРІПЛЕННЯ (ТЕСТ) -->
+    <section id="section-test" class="section">
+        <div class="hero animate-in" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+            <h1>🎓 Фінальний тест</h1>
+            <p class="hero-subtitle">Перевіримо, чи ти готовий використовувати логічні функції!</p>
+        </div>
+
+        <div id="quizContainer" class="quiz-container animate-in">
+            <!-- Питання генеруються JS -->
+        </div>
+
+        <div id="resultsSection" class="results-container hidden">
+            <div class="score-circle" id="finalScore">0%</div>
+            <h2 id="resultTitle">Відмінно!</h2>
+            <p id="resultMessage" style="color: var(--gray); margin: 1rem 0;"></p>
+            
+            <div style="margin-top: 2rem;">
+                <button class="btn" onclick="restartTest()">
+                    <span>🔄 Пройти ще раз</span>
+                </button>
+                <button class="btn btn-accent" onclick="nextSection('section-intro')" style="margin-left: 1rem;">
+                    <span>🏠 На початок</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // ===== СТАН ДОДАТКУ =====
+        const state = {
+            currentSection: 'section-intro',
+            score: 0,
+            studentName: '',
+            students: ['Олександр', 'Марія', 'Анна', 'Іван', 'Катерина'],
+            currentQuestion: 0,
+            correctAnswers: 0,
+            quizData: [
+                {
+                    question: "Яка функція перевіряє умову і повертає одне з двох значень?",
+                    options: ["SUM", "IF", "AND", "OR"],
+                    correct: 1,
+                    type: "choice"
+                },
+                {
+                    question: "Що поверне функція =AND(5>3; 10<20)?",
+                    options: ["TRUE", "FALSE", "5", "Помилку"],
+                    correct: 0,
+                    type: "choice"
+                },
+                {
+                    question: "Функція OR повертає TRUE, якщо виконана хоча б одна умова",
+                    options: ["Правда", "Неправда"],
+                    correct: 0,
+                    type: "boolean"
+                },
+                {
+                    question: "Яка формула визначить 'Відмінно' при балі ≥ 9?",
+                    options: [
+                        "=IF(A1>9;'Відмінно';'Добре')",
+                        "=IF(A1>=9;'Відмінно';'Добре')",
+                        "=IF(A1<9;'Відмінно';'Добре')",
+                        "=AND(A1>=9;'Відмінно')"
+                    ],
+                    correct: 1,
+                    type: "choice"
+                },
+                {
+                    question: "NOT(TRUE) поверне:",
+                    options: ["TRUE", "FALSE", "1", "0"],
+                    correct: 1,
+                    type: "choice"
+                },
+                {
+                    question: "Для отримання знижки потрібно: сума > 500 І картка VIP. Яка функція?",
+                    options: ["IF", "OR", "AND", "NOT"],
+                    correct: 2,
+                    type: "choice"
+                },
+                {
+                    question: "Абсолютне посилання $A$1 не змінюється при копіюванні",
+                    options: ["Правда", "Неправда"],
+                    correct: 0,
+                    type: "boolean"
+                },
+                {
+                    question: "Що робить вкладена функція IF(IF(умова;...)?",
+                    options: [
+                        "Перевіряє кілька умов послідовно",
+                        "Помножує числа",
+                        "Шукає максимум",
+                        "Об'єднує текст"
+                    ],
+                    correct: 0,
+                    type: "choice"
+                }
+            ]
+        };
+
+        // ===== НАВІГАЦІЯ =====
+        function nextSection(sectionId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            state.currentSection = sectionId;
+            updateProgress();
+            
+            // Спеціальні ініціалізації
+            if (sectionId === 'section-test') {
+                initQuiz();
+            }
+            
+            window.scrollTo(0, 0);
+        }
+
+        function updateProgress() {
+            const sections = ['section-intro', 'section-recall', 'section-main', 'section-practice', 'section-test'];
+            const currentIndex = sections.indexOf(state.currentSection);
+            const progress = ((currentIndex + 1) / sections.length) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        // ===== ВСТУП ТА ВХІД =====
+        function toggleCard(card) {
+            card.classList.toggle('expanded');
+        }
+
+        function joinClass() {
+            const nameInput = document.getElementById('studentName');
+            const name = nameInput.value.trim();
+            
+            if (!name) {
+                showMessage('Будь ласка, введи своє ім\'я!', 'error');
+                nameInput.classList.add('shake');
+                setTimeout(() => nameInput.classList.remove('shake'), 500);
+                return;
+            }
+            
+            state.studentName = name;
+            
+            // Додаємо учня до списку
+            const studentsList = document.getElementById('studentsList');
+            studentsList.innerHTML = '';
+            
+            // Додаємо поточного учня першим
+            const studentDiv = document.createElement('div');
+            studentDiv.className = 'student-badge';
+            studentDiv.style.setProperty('--i', 0);
+            studentDiv.innerHTML = `<span>👤</span><span>${name} (Ти)</span>`;
+            studentsList.appendChild(studentDiv);
+            
+            // Додаємо імітованих однокласників
+            const shuffled = state.students.sort(() => 0.5 - Math.random()).slice(0, 3);
+            shuffled.forEach((student, index) => {
+                const div = document.createElement('div');
+                div.className = 'student-badge';
+                div.style.setProperty('--i', index + 1);
+                div.innerHTML = `<span>👤</span><span>${student}</span>`;
+                studentsList.appendChild(div);
+            });
+            
+            // Оновлюємо лічильник
+            document.getElementById('onlineCount').textContent = shuffled.length + 1;
+            
+            // Показуємо панель класу
+            document.getElementById('classroomInfo').classList.remove('hidden');
+            document.getElementById('classroomInfo').classList.add('fade-in');
+            
+            addScore(10);
+            showMessage('Вітаємо в класі! +10 балів', 'success');
+        }
+
+        // ===== АКТУАЛІЗАЦІЯ ЗНАНЬ =====
+        function checkReferenceAnswer(option, isCorrect) {
+            const options = option.parentElement.querySelectorAll('.quiz-option');
+            options.forEach(opt => opt.style.pointerEvents = 'none');
+            
+            if (isCorrect) {
+                option.classList.add('correct');
+                showMessage('Правильно! Абсолютне посилання $A$1 не змінюється.', 'success');
+                addScore(5);
+            } else {
+                option.classList.add('wrong');
+                // Підсвічуємо правильну відповідь
+                options[1].classList.add('correct');
+                showMessage('Не зовсім так. $A$1 залишиться незмінним, а B1 стане B2.', 'error');
+            }
+        }
+
+        // ===== СИМУЛЯТОРИ EXCEL =====
+        function updateIF(element) {
+            const score = parseInt(element.textContent) || 0;
+            const output = document.getElementById('gradeOutput');
+            
+            if (score >= 9) {
+                output.textContent = 'Відмінно';
+                output.style.color = '#10b981';
+            } else if (score >= 7) {
+                output.textContent = 'Добре';
+                output.style.color = '#3b82f6';
+            } else if (score >= 4) {
+                output.textContent = 'Задовільно';
+                output.style.color = '#f59e0b';
+            } else {
+                output.textContent = 'Незадовільно';
+                output.style.color = '#ef4444';
+            }
+            
+            // Анімація оновлення
+            output.classList.add('success-pop');
+            setTimeout(() => output.classList.remove('success-pop'), 500);
+        }
+
+        function updateAND() {
+            const amount = parseInt(document.getElementById('amountInput').textContent) || 0;
+            const status = document.getElementById('statusInput').textContent.trim();
+            const output = document.getElementById('discountOutput');
+            
+            const hasDiscount = amount >= 1000 && status.toUpperCase() === 'VIP';
+            output.textContent = hasDiscount ? 'TRUE (Знижка 10%)' : 'FALSE (Немає знижки)';
+            output.style.color = hasDiscount ? '#10b981' : '#ef4444';
+            
+            output.classList.add('success-pop');
+            setTimeout(() => output.classList.remove('success-pop'), 500);
+        }
+
+        // ===== ТЕСТ =====
+        function initQuiz() {
+            state.currentQuestion = 0;
+            state.correctAnswers = 0;
+            document.getElementById('resultsSection').classList.add('hidden');
+            document.getElementById('quizContainer').classList.remove('hidden');
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const quiz = state.quizData[state.currentQuestion];
+            const container = document.getElementById('quizContainer');
+            
+            let optionsHTML = '';
+            if (quiz.type === 'choice') {
+                optionsHTML = quiz.options.map((opt, idx) => `
+                    <div class="quiz-option" onclick="checkAnswer(${idx})">
+                        <span class="option-letter">${String.fromCharCode(65 + idx)}</span>
+                        <span>${opt}</span>
+                    </div>
+                `).join('');
+            } else {
+                optionsHTML = `
+                    <div class="quiz-option" onclick="checkAnswer(0)">
+                        <span class="option-letter">✓</span>
+                        <span>Правда</span>
+                    </div>
+                    <div class="quiz-option" onclick="checkAnswer(1)">
+                        <span class="option-letter">✗</span>
+                        <span>Неправда</span>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <span class="badge">Питання ${state.currentQuestion + 1} з ${state.quizData.length}</span>
+                    <span style="color: var(--gray);">Балів: ${state.score}</span>
+                </div>
+                <p class="quiz-question">${quiz.question}</p>
+                <div class="quiz-options">${optionsHTML}</div>
+            `;
+        }
+
+        function checkAnswer(selectedIndex) {
+            const quiz = state.quizData[state.currentQuestion];
+            const options = document.querySelectorAll('.quiz-option');
+            
+            options.forEach(opt => opt.style.pointerEvents = 'none');
+            
+            const isCorrect = selectedIndex === quiz.correct;
+            
+            if (isCorrect) {
+                options[selectedIndex].classList.add('correct');
+                showMessage('🎉 Молодець! Правильно!', 'success');
+                state.correctAnswers++;
+                addScore(10);
+            } else {
+                options[selectedIndex].classList.add('wrong');
+                options[quiz.correct].classList.add('correct');
+                showMessage('Спробуй ще! Правильна відповідь підсвічена.', 'error');
+            }
+            
+            setTimeout(() => {
+                state.currentQuestion++;
+                if (state.currentQuestion < state.quizData.length) {
+                    showQuestion();
+                } else {
+                    showResults();
+                }
+            }, 1500);
+        }
+
+        function showResults() {
+            document.getElementById('quizContainer').classList.add('hidden');
+            const results = document.getElementById('resultsSection');
+            results.classList.remove('hidden');
+            results.classList.add('fade-in');
+            
+            const percentage = Math.round((state.correctAnswers / state.quizData.length) * 100);
+            const scoreCircle = document.getElementById('finalScore');
+            const title = document.getElementById('resultTitle');
+            const message = document.getElementById('resultMessage');
+            
+            // Анімація рахунку
+            let current = 0;
+            const timer = setInterval(() => {
+                current++;
+                scoreCircle.textContent = current + '%';
+                if (current >= percentage) clearInterval(timer);
+            }, 20);
+            
+            if (percentage >= 80) {
+                title.textContent = '🏆 Відмінно! Ти експерт!';
+                message.textContent = 'Ти чудово знаєш логічні функції. Можеш складати складні формули!';
+                addScore(50);
+            } else if (percentage >= 60) {
+                title.textContent = '👍 Добре! Є потенціал!';
+                message.textContent = 'Ти розумієш основи, але потрібно ще трохи практики.';
+                addScore(30);
+            } else {
+                title.textContent = '📚 Потрібно повторити';
+                message.textContent = 'Рекомендуємо ще раз переглянути матеріал і спробувати тест знову.';
+            }
+        }
+
+        function restartTest() {
+            initQuiz();
+        }
+
+        // ===== ДОПОМІЖНІ ФУНКЦІЇ =====
+        function addScore(points) {
+            state.score += points;
+            document.getElementById('scoreValue').textContent = state.score;
+        }
+
+        function showMessage(text, type) {
+            const msg = document.getElementById('message');
+            msg.textContent = text;
+            msg.className = `message ${type} show`;
+            
+            setTimeout(() => {
+                msg.classList.remove('show');
+            }, 3000);
+        }
+
+        // Ініціалізація
+        document.addEventListener('DOMContentLoaded', () => {
+            updateProgress();
+        });
+    </script>
+</body>
+</html>
